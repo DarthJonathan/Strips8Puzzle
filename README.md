@@ -2,30 +2,21 @@
 Created by Jonathan Hosea \
 University of Regina - 200401831
 
-To install node.js dependecy 
+To install node.js dependecy *needed because of express
 
 ```$xslt
 npm i
 ```
 
-This code can be run by excecuting on the terminal or using 
+This code can be run by excecuting on the terminal 
 
 ```$xslt
 node strips.js
 ```
 
-The input of the puzzle can be change at the 
+and opening the webpage of 
 
-```$xslt
- box = [
-    [0,0,0],
-    [0,0,0],
-    [0,0,0] 
- ];
 ```
-
-which is located at the 
-
-```$xslt
-function init()
+http://localhost:3080/
 ```
+Please make sure you have internet connection and the latest chrome/firefox, and port 3080 is not used by any other process.

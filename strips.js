@@ -1,3 +1,13 @@
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const path = require('path');
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+// parse application/json
+app.use(bodyParser.json());
+
 var box = [];
 var init_state = [];
 var curr_state = [];
@@ -17,19 +27,19 @@ function init() {
     // ];
 
     //Set the box
-    box = [
-        [1,2,3],
-        [7,8,4],
-        [6,0,5]
-    ];
-
+    // box = [
+    //     [1,2,3],
+    //     [7,8,4],
+    //     [6,0,5]
+    // ];
+    //
     //Get the box states
-    setInitialState();
+    // setInitialState(box);
 
-    goal_state = [
-        ['on', 1, 1, 1], ['on', 2, 1, 2], ['on', 3, 1, 3], ['on', 4, 2, 3], ['on', 5, 3, 3], ['on', 6, 3, 2], ['on', 7, 3, 1], ['on', 8, 2, 1],
-        ['clear', 0, 2, 2]
-    ];
+    // goal_state = [
+    //     ['on', 1, 1, 1], ['on', 2, 1, 2], ['on', 3, 1, 3], ['on', 4, 2, 3], ['on', 5, 3, 3], ['on', 6, 3, 2], ['on', 7, 3, 1], ['on', 8, 2, 1],
+    //     ['clear', 0, 2, 2]
+    // ];
 
     curr_state = goal_state.slice();
 
@@ -82,7 +92,7 @@ function init() {
     possible_moves = getAllPossibleMoves();
 }
 
-function setInitialState () {
+function setInitialState (box) {
 
     init_state = [];
 
@@ -92,6 +102,21 @@ function setInitialState () {
                 init_state.push(['on', box[i][j], i+1, j+1]);
             }else {
                 init_state.push(['clear', 0, i+1, j+1]);
+            }
+        }
+    }
+}
+
+function setGoalState (box) {
+
+    goal_state = [];
+
+    for(var i=0; i<3; i++) {
+        for(var j=0; j<3; j++) {
+            if(box[i][j] != 0){
+                goal_state.push(['on', box[i][j], i+1, j+1]);
+            }else {
+                goal_state.push(['clear', 0, i+1, j+1]);
             }
         }
     }
@@ -227,6 +252,8 @@ function pickBestMove () {
 
 function runStrips () {
 
+    moves = [];
+
     //Initialize the game parameters
     init();
     var time = Date.now();
@@ -253,18 +280,100 @@ function runStrips () {
         }
     }
 
-    console.log('Initial State : ');
-    console.log(init_state);
-
-    console.log('Current State : ');
-    console.log(curr_state);
-
-    console.log('Goal State : ');
-    console.log(goal_state);
-
+    // console.log('Initial State : ');
+    // console.log(init_state);
+    //
+    // console.log('Current State : ');
+    // console.log(curr_state);
+    //
+    // console.log('Goal State : ');
+    // console.log(goal_state);
+    //
     console.log('Solution Found!');
     console.log(moves.reverse());
+
+    return moves.reverse();
 }
 
 //Run the strips
-runStrips();
+// runStrips();
+
+app.get('/', (req, res) => {
+    // res.send(runStrips());
+    res.sendFile(path.join( __dirname + '/home.html' ));
+});
+
+app.post('/dostrips', (req, res) => {
+
+    var data = req.body;
+    var input_initial = [];
+    var input_goal = [];
+
+    //Reset all variables
+    init_state = [];
+    curr_state = [];
+    goal_state = [];
+    moves = [];
+
+    possible_moves = [];
+    operators = [];
+
+    box[0] = [];
+    box[1] = [];
+    box[2] = [];
+
+    data.forEach((value, index) => {
+        if(index < 9){
+            if(input_initial.includes(value.value)) {
+                res.status(400);
+                res.send('Duplicate Number Entered in Initial State');
+                return;
+            }
+
+            input_initial.push(value.value);
+
+            if(index<3) {
+                box[0].push(value.value);
+            }else if(index<6) {
+                box[1].push(value.value);
+            }else {
+                box[2].push(value.value);
+            }
+
+            setInitialState(box);
+
+        }
+    });
+
+    box[0] = [];
+    box[1] = [];
+    box[2] = [];
+
+    data.forEach((value, index) => {
+        if(index > 8){
+            if(input_goal.includes(value.value)) {
+                res.status(400);
+                res.send('Duplicate Number Entered in Goal State');
+                return;
+            }
+
+            goal_state.push(value.value);
+
+            if(index<12) {
+                box[0].push(value.value);
+            }else if(index<15) {
+                box[1].push(value.value);
+            }else {
+                box[2].push(value.value);
+            }
+
+            setGoalState(box);
+        }
+    });
+
+    res.send(runStrips());
+});
+
+app.listen(3080, () => {
+    console.log('Listening to port 3080');
+});

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Strips Algorithm</title>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <div class="container">
+        <form action="" id="states" method="post">
+            <div class="row mt-5">
+                <div class="col-lg-6" style="height:350px">
+                    <h2 class="mb-5">Initial State</h2>
+                    <table class="table text-center py-3">
+                        <tr style="height: 100px;">
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state1">
+                            </td>
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state2">
+                            </td>
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state3">
+                            </td>
+                        </tr>
+                        <tr style="height: 100px;">
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state4">
+                            </td>
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state5">
+                            </td>
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state6">
+                            </td>
+                        </tr>
+                        <tr style="height: 100px;">
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state7">
+                            </td>
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state8">
+                            </td>
+                            <td>
+                                <input type="text" name="initial_state[]" class="form-control" id="initial_state9">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-lg-6" style="height:300px">
+                    <h2 class="mb-5">Goal State</h2>
+                    <table class="table text-center py-3">
+                        <tr style="height: 100px;">
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state1">
+                            </td>
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state2">
+                            </td>
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state3">
+                            </td>
+                        </tr>
+                        <tr style="height: 100px;">
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state4">
+                            </td>
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state5">
+                            </td>
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state6">
+                            </td>
+                        </tr>
+                        <tr style="height: 100px;">
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state7">
+                            </td>
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state8">
+                            </td>
+                            <td>
+                                <input type="text" name="goal_state[]" class="form-control" id="goal_state9">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-lg-4 mt-5">
+                    <button class="btn btn-dark btn-block find-solution" type="button">Find Solution</button>
+                </div>
+            </div>
+        </form>
+        <div class="row mt-5">
+            <div class="col-lg-12">
+                <h2>Moves Data</h2>
+                <pre class="move-data"></pre>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(document).ready(() => {
+        $('.find-solution').click(() => {
+
+            var data = $('#states').serializeArray();
+            $('.move-data').empty();
+
+
+            fetch('/dostrips', {
+                body: JSON.stringify(data),
+                method: "POST",
+                headers: {"Content-Type": "application/json"}
+            }).then((response) => {
+                return response.json();
+            }).then((data) => {
+                console.log(data);
+
+                data.forEach((value, index) => {
+                    $('.move-data').append(value + '<br>');
+                });
+            });
+
+        });
+    });
+</script>
+</html>
