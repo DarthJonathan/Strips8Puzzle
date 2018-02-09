@@ -15,7 +15,7 @@ var goal_state = [];
 var moves = [];
 
 var possible_moves = [];
-var operators = [];
+var conditions = [];
 
 function init() {
     var all_possible_moves = [];
@@ -43,7 +43,7 @@ function init() {
 
     curr_state = goal_state.slice();
 
-    //Store all possible moves and it's operators
+    //Store all possible moves and it's conditions
     for(var x=1; x<9; x++) {
         for(var i=1; i<4; i++) {
             for(var j=1; j<4; j++){
@@ -86,7 +86,7 @@ function init() {
             ]
         ];
 
-        operators.push(operator);
+        conditions.push(operator);
     });
 
     possible_moves = getAllPossibleMoves();
@@ -122,11 +122,11 @@ function setGoalState (box) {
     }
 }
 
-function updateStateOperators (move) {
+function updateStateConditions (move) {
 
     // console.log(move);
 
-    //Get all operators corresponding to the move, and remove them from the current state
+    //Get all conditions corresponding to the move, and remove them from the current state
     curr_state.forEach((operator, index) => {
         if(operator[2] == move[2] && operator[3] == move[3]) {
             curr_state.splice(index, 1);
@@ -140,7 +140,7 @@ function updateStateOperators (move) {
     });
 
     //Add the new preconditions of the move to the current state bank
-    operators.forEach((value, index) => {
+    conditions.forEach((value, index) => {
         if(value[0][1] == move[1] && value[0][2] == move[2] && value[0][3] == move[3] && value[0][4] == move[4] && value[0][5] == move[5]) {
             curr_state = curr_state.concat(value[1]);
         }
@@ -205,43 +205,48 @@ function getAllPossibleMoves() {
     return moves;
 }
 
-function checkIntersection(x, y) {
+function checkSimillarities(x, y) {
 
-    var intersection = [];
+    var simillar = [];
 
     x.forEach((valueX) => {
         y.forEach(valueY => {
             if(valueX[0] == valueY[0] && valueX[1] == valueY[1] && valueX[2] == valueY[2] && valueX[3] == valueY[3]) {
-                intersection.push(valueY);
+                simillar.push(valueY);
             }
         })
     });
 
-    return intersection;
+    return simillar;
 }
 
-function pickBestMove () {
+function getBestMove () {
 
     //Compare the moves with the best precondition match ups
     var winPts = -1;
     var winner = [];
 
+    //For all the clear block can move
     possible_moves.forEach((move, index) => {
         var precond = [];
 
-        operators.forEach((value, index) => {
+        //Check the one that fits the precondition
+        conditions.forEach((value, index) => {
             if(value[0][1] == move[1] && value[0][2] == move[2] && value[0][3] == move[3] && value[0][4] == move[4] && value[0][5] == move[5]){
                 precond = precond.concat(value[1]);
             }
         });
 
         var movePoints = 0;
-        movePoints = checkIntersection(precond, init_state).length;
+        //Check the preconds simmilarities with initial state
+        movePoints = checkSimillarities(precond, init_state).length;
 
+        //if the move conditions can be found in the initial state than that is the winner
         if(movePoints > winPts) {
             winner = [];
             winner.push(move);
             winPts = movePoints;
+        //if everything is the same then just random the move, was trying to do bfs but too long
         }else if(movePoints == winPts) {
             winner.push(move);
         }
@@ -259,20 +264,19 @@ function runStrips () {
     var time = Date.now();
     var counter = 0;
 
-    while(checkIntersection(curr_state, init_state).length < 9) {
+    while(checkSimillarities(curr_state, init_state).length < 9) {
 
         possible_moves = getAllPossibleMoves();
 
-        var choosen = pickBestMove();
+        var choosen = getBestMove();
         moves.push(choosen);
-        updateStateOperators(choosen);
+        updateStateConditions(choosen);
         console.log('Elapsed Time : ' + (Date.now() - time)/100);
         counter++;
 
         // if(counter > 1)
         //     break;
 
-        // console.log(checkIntersection(curr_state, init_state).length);
 
         if(((Date.now() - time)/100) > 1000){
             break;
@@ -316,7 +320,7 @@ app.post('/dostrips', (req, res) => {
     moves = [];
 
     possible_moves = [];
-    operators = [];
+    conditions = [];
 
     box[0] = [];
     box[1] = [];
